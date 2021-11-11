@@ -36,7 +36,7 @@ public class MyUserDetailsService implements UserDetailsService {
         }
 
         // 这里是权限角色的list，对应的用户有对应的权限，这里我们虚拟一个admin角色出来
-        List<GrantedAuthority> auth= AuthorityUtils.commaSeparatedStringToAuthorityList("admin");
+        List<GrantedAuthority> auth= AuthorityUtils.commaSeparatedStringToAuthorityList("admin2");
 
         // 从查询的数据库的用户对象里面拿到
         return new User(users.getUsername(),new BCryptPasswordEncoder().encode(users.getPassword()),auth);

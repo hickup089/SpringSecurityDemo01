@@ -12,4 +12,15 @@ public class TestController {
     public String add(){
         return "hello security";
     }
+
+
+    @GetMapping("/index")
+    public String index(){
+        return "hello index";
+    }
+
+    @GetMapping("/goods")
+    public String goods(){
+        return "hello goods";
+    }
 }
