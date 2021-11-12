@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
@@ -24,13 +25,19 @@ public class SecurityConfigTest extends WebSecurityConfigurerAdapter {
     @Autowired
    private DataSource dataSource;
 
+
+
     @Bean
     public PersistentTokenRepository persistentTokenRepository(){
-        JdbcTokenRepositoryImpl jdbcTokenRepository=new JdbcTokenRepositoryImpl();
-        // 给JdbcTokenRepositoryImpl一个datasource
-        jdbcTokenRepository.setDataSource(dataSource);
-
-        return jdbcTokenRepository;
+//        JdbcTokenRepositoryImpl jdbcTokenRepository=new JdbcTokenRepositoryImpl();
+//        // 给JdbcTokenRepositoryImpl一个datasource
+//        jdbcTokenRepository.setDataSource(dataSource);
+//
+//
+//
+//        return jdbcTokenRepository;
+        RedisTokenRepositoryImpl redisTokenRepository=new RedisTokenRepositoryImpl();
+        return redisTokenRepository;
     }
 
     // 重写这个configure方法
@@ -69,7 +76,8 @@ public class SecurityConfigTest extends WebSecurityConfigurerAdapter {
                 .antMatchers("/test/index").hasAnyRole("sale,admin")
 
                 .anyRequest().authenticated()
-                .and().rememberMe().tokenRepository(persistentTokenRepository())
+               .and().rememberMe().tokenRepository(new JdbcTokenRepositoryImpl())
+
                 .tokenValiditySeconds(600) // 设置有效时长
                 .userDetailsService(userDetailsService)
 
