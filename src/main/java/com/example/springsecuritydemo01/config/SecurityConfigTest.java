@@ -9,12 +9,30 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 // WebSecurityConfigurerAdapter继承这个类
 @Configuration
 public class SecurityConfigTest extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
+
+    // SpringSecurity的token的实现，注入数据源
+    @Autowired
+   private DataSource dataSource;
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository(){
+        JdbcTokenRepositoryImpl jdbcTokenRepository=new JdbcTokenRepositoryImpl();
+        // 给JdbcTokenRepositoryImpl一个datasource
+        jdbcTokenRepository.setDataSource(dataSource);
+
+        return jdbcTokenRepository;
+    }
+
     // 重写这个configure方法
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -51,6 +69,11 @@ public class SecurityConfigTest extends WebSecurityConfigurerAdapter {
                 .antMatchers("/test/index").hasAnyRole("sale,admin")
 
                 .anyRequest().authenticated()
+                .and().rememberMe().tokenRepository(persistentTokenRepository())
+                .tokenValiditySeconds(600) // 设置有效时长
+                .userDetailsService(userDetailsService)
+
+
                 .and().csrf().disable(); //关闭csrf防护
 
     }
